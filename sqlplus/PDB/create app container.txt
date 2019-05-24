@@ -1,0 +1,13 @@
+-APP CONTAINER CREATE:
+
+ho mkdir -p /u01/app/oracle/oradata/orclcdb/sales_app_root
+
+CREATE PLUGGABLE DATABASE sales_app_root AS APPLICATION CONTAINER
+         ADMIN USER appadmin IDENTIFIED BY oracle
+         --CREATE_FILE_DEST='/u01/app/oracle/oradata/orclcdb/sales_app_root';
+	FILE_NAME_CONVERTER()
+
+-APP CONTAINER DELETE:
+
+DROP PLUGGABLE DATABASE apppdb1 INCLUDING DATAFILES;
+DROP PLUGGABLE DATABASE apppdb1 KEEP DATAFILES;

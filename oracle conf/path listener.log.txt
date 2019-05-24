@@ -1,0 +1,1 @@
+/u01/app/oracle/diag/tnslsnr/ora12/listener/trace/listener.log

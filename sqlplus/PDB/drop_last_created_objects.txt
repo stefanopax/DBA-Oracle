@@ -1,0 +1,2 @@
+-- script to drop all objects created today
+select 'drop '||object_type||' '|| object_name || ';' from user_objects where created < sysdate-1/24;

@@ -1,0 +1,4 @@
+undef user 
+SELECT sum(bytes)/1024/1024/1024 AS TOT_SCHEMA_GB
+FROM dba_segments 
+WHERE owner LIKE '&&user';

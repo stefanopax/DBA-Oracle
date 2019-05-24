@@ -1,0 +1,157 @@
+yum install xauth
+yum install xclock
+
+1) Install the following packages
+yum install -y xorg-x11-server-Xorg xorg-x11-xauth xorg-x11-apps
+
+2) Enable X11 Fowarding
+grep -i X11Forwarding /etc/ssh/sshd_config
+Should be set to Yes
+
+3) Logoff and login as
+ssh -Y user@host
+
+4) Test
+xclock& , xeyes&
+
+
+
+-- check grid13
+
+EPS_DR[m.spinoni@grid13 ~]$ grep MemTotal /proc/meminfo
+MemTotal:        8010504 kB
+EPS_DR[m.spinoni@grid13 ~]$ grep SwapTotal /proc/meminfo
+SwapTotal:       4190204 kB
+EPS_DR[m.spinoni@grid13 ~]$ df -h /tmp
+Filesystem                  Size  Used Avail Use% Mounted on
+/dev/mapper/VolGroup05-tmp  4.0G   37M  4.0G   1% /tmp
+EPS_DR[m.spinoni@grid13 ~]$ free
+              total        used        free      shared  buff/cache   available
+Mem:        8010504      144672     7215520       25164      650312     7566520
+Swap:       4190204           0     4190204
+EPS_DR[m.spinoni@grid13 ~]$ uname -m
+x86_64
+EPS_DR[m.spinoni@grid13 ~]$ df -h /dev/shm
+Filesystem      Size  Used Avail Use% Mounted on
+tmpfs           3.9G     0  3.9G   0% /dev/shm
+
+
+-- check observer
+
+UK_PRI[m.spinoni@observer ~]$ grep MemTotal /proc/meminfo
+MemTotal:        3882020 kB
+UK_PRI[m.spinoni@observer ~]$ grep SwapTotal /proc/meminfo
+SwapTotal:       4190204 kB
+UK_PRI[m.spinoni@observer ~]$ df -h /tmp
+Filesystem                  Size  Used Avail Use% Mounted on
+/dev/mapper/VolGroup05-tmp  4.0G   40M  4.0G   1% /tmp
+UK_PRI[m.spinoni@observer ~]$ free
+              total        used        free      shared  buff/cache   available
+Mem:        3882020      107504     3076704       33348      697812     3488832
+Swap:       4190204           0     4190204
+UK_PRI[m.spinoni@observer ~]$ uname -m
+x86_64
+UK_PRI[m.spinoni@observer ~]$ df -h /dev/shm
+Filesystem      Size  Used Avail Use% Mounted on
+tmpfs           1.9G     0  1.9G   0% /dev/shm
+
+-- disabling transparent hugepage
+vi /etc/default/grub
+
+aggiungere "transparent_hugepage=never" alla stringa GRUB_CMDLINE_LINUX
+es. GRUB_CMDLINE_LINUX="rd.lvm.lv=rhel/root rd.lvm.lv=rhel/swap ... transparent_hugepage=never"
+
+ricompilare grub
+grub2-mkconfig -o /boot/grub2/grub.cfg
+
+riavviare la macchina
+shutdown -r now
+
+
+
+
+-- creazione gruppi e utenze
+/usr/sbin/groupadd -g 501 oinstall
+/usr/sbin/groupadd -g 504 dba
+
+/usr/sbin/useradd -u 505 -g oinstall -G dba oracle
+
+-- creazione cartella oracle
+cd /app
+mkdir oracle
+chown oracle. oracle/
+
+---modifica sudoers file 
+cmd visudo
+aggiungere  in calce:
+%eps ALL=(oracle) NOPASSWD: ALL
+
+-- modificare tmp in modo che sia eseguibile
+mount -o remount,exec /tmp
+oppure 
+export TMP=/u01/oracle
+export TMPDIR=$TMP
+--
+sudo yum install libXtst
+sudo yum install libstdc++-devel
+sudo yum install gcc-c++
+sudo yum install compat-libcap1
+sudo yum install ksh
+sudo yum install libaio-devel
+sudo yum install smartmontools
+sudo yum install glibc-devel.i686 glibc-devel.x86_64   -> la versione i686 solo sulla macchina grid
+
+cmd /tmp/CVU_12.2.0.1.0_oracle/runfixup.sh
+
+
+/app/oraInventory/orainstRoot.sh
+
+/app/oracle/product/12.2.0/dbhome_1/root.sh
+
+
+
+
+--- INSTALLAZIONE EM13c
+ ./em13200_linux64.bin -J-Djava.io.tmpdir=/app/oracle/tmp
+ 
+ password "weblogic" e "nodemanager" : weblogic2018
+ 
+ show parameter compatible
+ 
+ alter system set "_allow_insert_with_update_check" = true;
+ 
+ -- sysman  e agent registration password : sysman2018
+ 
+ 
+ 
+  /app/oracle/middleware/allroot.sh
+ 
+
+This information is also available at:
+
+	/app/oracle/middleware/install/setupinfo.txt
+
+See the following for information pertaining to your Enterprise Manager installation:
+
+
+Use the following URL to access:
+
+	1. Enterprise Manager Cloud Control URL: https://grid13.europsl.it:7803/em
+	2. Admin Server URL: https://grid13.europsl.it:7102/console
+	3. BI Publisher URL: https://grid13.europsl.it:9803/xmlpserver
+
+The following details need to be provided while installing an additional OMS:
+
+	1. Admin Server Host Name: grid13.europsl.it
+	2. Admin Server Port: 7102
+
+You can find the details on ports used by this deployment at : /app/oracle/middleware/install/portlist.ini
+
+
+NOTE:
+An encryption key has been generated to encrypt sensitive data in the Management Repository. If this key is lost, all encrypted data in the Repository becomes unusable. 
+
+A backup of the OMS configuration is available in /app/oracle/gc_inst/em/EMGC_OMS1/sysman/backup on host grid13.europsl.it. See Cloud Control Administrators Guide for details on how to back up and recover an OMS.
+
+NOTE: This backup is valid only for the initial OMS configuration. For example, it will not reflect plug-ins installed later, topology changes like the addition of a load balancer, or changes to other properties made using emctl or emcli. Backups should be created on a regular basis to ensure they capture the current OMS configuration. Use the following command to backup the OMS configuration:
+/app/oracle/middleware/bin/emctl exportconfig oms -dir <backup dir>

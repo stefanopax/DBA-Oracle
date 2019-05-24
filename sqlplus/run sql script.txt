@@ -1,0 +1,4 @@
+- add SPOOL filename.log at the beginning
+- add SPOOL OFF at the end
+
+- when adding sql code end trigger with ; /

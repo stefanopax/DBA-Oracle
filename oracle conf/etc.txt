@@ -1,0 +1,7 @@
+-- startup open
+oratab:
+db_sid:db_path:Y/N
+
+-- local dns
+hosts:
+ind_ip host.domain ...

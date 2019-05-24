@@ -1,0 +1,51 @@
+-- from sys
+expdp  \"sys@omnichannel as sysdba\" SCHEMAS=MPLAKA DUMPFILE= LOGFILE=
+-- it is not possible to add exclude=statistics in impdp
+impdp  \"sys@omnichannel as sysdba\" SCHEMAS=MPLAKA REMAP_TABLESPACE=USERS:MPLAKA,INDX:MPLAKA_INDEX DIRECTORY=data_pump_dir DUMPFILE=schemas.dmp LOGFILE=schemas.log TRANSFORM=OID:n
+
+-- from system
+expdp system/sys2017 schemas=FTFS_LOTTO tables=EMP,DEPT directory=DATADIR dumpfile=ftfs_lotto.dmp logfile=ftfs_lotto.log
+-- pass parameters into parfile
+expdp system/sys2017 parfile=ftfs_lotto.par
+
+-- from local user
+expdp FTFS_LOTTO/FTFS_LOTTO directory=DATADIRDP dumpfile=lotto.dmp logfile=lotto.log
+impdp NEWUSER/NEWUSER directory=DATADIRDP dumpfile=lotto.dmp logfile=lotto.log
+
+------------------------------------------------------------------------------------------------------------------------
+
+-- working pluggable export-import datapump
+select * from dba_directories;
+
+-- directory must be created once you are into the pluggable database
+CREATE OR REPLACE DIRECTORY datadir AS '/home/oracle';
+-- if created from sys, directory must be granted as follows:
+GRANT READ, WRITE ON DIRECTORY datadir TO mplaka;
+
+-- os commands
+-- expdp mplaka/mplaka@pdb directory=datadir dumpfile=mplaka.dmp logfile=lotto.log;
+-- impdp mplaka/mplaka@newpdb directory=datadir dumpfile=mplaka.dmp logfile=lotto.log
+
+-------------------------------------------------------------------------------------------------------------------------
+-- remap schemas
+
+-- if not specified SCHEMAS parameter, just export system's objects
+=AULAKA,PFLAKA,JPLAKA,MPLAKA,RTLAKA
+expdp system/sys2017 SCHEMAS=RTLAKA,MPLAKA,GTLAKA,GWLAKACDC,GWLAKABCM,PFLAKA,ECLAKA,AULAKA,JPLAKA directory=DATADIRDP dumpfile=schemas.dmp logfile=schemas.log
+
+-- if not matching tablespaces'names, specify REMAP_TABLESPACE parameter
+impdp system/sys@pdb REMAP_TABLESPACE=USERS:laka,INDX:laka_indx DIRECTORY=datadir DUMPFILE=schemas.dmp LOGFILE=schemas.log
+
+-- export all schemas
+expdp system/sys2017 FULL=y DIRECTORY=datadir DUMPFILE=full_schemas.dmp LOGFILE=full_schemas.log
+impdp system/sys@pdb REMAP_SCHEMA=AULAKA:LAKA,PFLAKA:LAKA,JPLAKA:LAKA,MPLAKA:LAKA,RTLAKA:LAKA REMAP_TABLESPACE=USERS:laka,INDX:laka_indx DUMPFILE=full_schemas.dmp LOGFILE=full_schemas.log
+
+-- export specific schema
+expdp system/sys2017 SCHEMAS=ECLAKA INCLUDE=TABLE,VIEW,PACKAGE DIRECTORY=datadir DUMPFILE=eclaka.dmp LOGFILE=eclaka.log
+impdp system/sys@newpdb REMAP_TABLESPACE=USERS:ECLAKA,INDX:ECLAKA_INDEX DIRECTORY=datadir DUMPFILE=eclaka.dmp LOGFILE=eclaka.log
+
+-- For each user, create 2 tbls
+-- tns create service omnichannel
+-- EXCLUDE=index_statistics, EXCLUDE=table_statistics
+
+impdp  \"sys@omnichannel as sysdba\" SCHEMAS=MPLAKA REMAP_TABLESPACE=USERS:MPLAKA,INDX:MPLAKA_INDEX DIRECTORY=data_pump_dir DUMPFILE=schemas.dmp LOGFILE=schemas.log TRANSFORM=OID:n

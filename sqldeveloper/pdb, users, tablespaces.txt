@@ -1,0 +1,122 @@
+CL SCR;
+
+-- PDBS
+SHO pdbs;
+SHO con_name;
+ALTER SESSION SET CONTAINER=&pdb;
+
+-- TABLESPACE, DATAFILE
+
+-- select all tablespaces
+SELECT con_id, tablespace_name
+    FROM cdb_tablespaces ORDER BY 1;
+    
+-- select all tablespaces associated to pdb
+SELECT name, tablespace_name
+    FROM cdb_tablespaces 
+    JOIN v$services 
+    ON cdb_tablespaces.con_id=v$services.con_id;
+
+-- select all tablespaces associated to users
+SELECT TABLESPACE_NAME, USERNAME, ROUND(BYTES /1000 /1000, 2) AS MB ,
+    MAX_BYTES ,
+    BLOCKS ,
+    MAX_BLOCKS ,
+    DROPPED  FROM dba_ts_quotas
+    WHERE username LIKE '%LAKA%'
+    ORDER BY username, tablespace_name;
+	
+-- select all datafiles associated to tablespaces
+SELECT v$datafile.name AS datafile, v$tablespace.name AS tablespace, blocks, round(bytes /1000 /1000 /1000, 2) AS Gb, status
+    FROM v$datafile
+    JOIN v$tablespace
+    ON v$datafile.ts#=v$tablespace.ts#;
+
+-- select tablespace free usage from non-cdb database
+SELECT b.tablespace_name, tbs_size SizeMb, a.free_space FreeMb
+
+FROM  (SELECT tablespace_name, ROUND(SUM(bytes)/1024/1024 ,2) AS free_space
+
+       FROM dba_free_space
+
+       GROUP BY tablespace_name) a,
+
+      (SELECT tablespace_name, sum(bytes)/1024/1024 AS tbs_size
+
+       FROM dba_data_files
+
+       GROUP BY tablespace_name) b
+
+WHERE a.tablespace_name(+)=b.tablespace_name;
+
+-- create laka tablespace
+CREATE TABLESPACE &tbls
+    LOGGING
+    DATAFILE '/u01/app/oracle/product/oradata/ORA12C/ora12cpdb/gtlaka.dbf' SIZE 16M
+    AUTOEXTEND ON NEXT  16M
+    MAXSIZE UNLIMITED EXTENT MANAGEMENT LOCAL SEGMENT SPACE MANAGEMENT AUTO;
+
+CREATE TABLESPACE &tbls_index
+    LOGGING
+    DATAFILE '/u01/app/oracle/product/oradata/ORA12C/ora12cpdb/gtlaka_index.dbf' SIZE 16M
+    AUTOEXTEND ON NEXT  16M
+    MAXSIZE UNLIMITED EXTENT MANAGEMENT LOCAL SEGMENT SPACE MANAGEMENT AUTO;
+
+-- clear tablespace
+ALTER TABLESPACE &name COALESCE;
+
+-- drop tablespace
+DROP TABLESPACE &tbls
+   INCLUDING CONTENTS AND DATAFILES;
+   
+SELECT * FROM dba_segments;
+
+-- select invalid objects
+SELECT substr(a.object_name,1,16) "Pack",
+        NLS_INITCAP(a.status) "pac" ,
+        TO_CHAR(a.last_ddl_time, 'DD-MON-YYYY HH24:MI:SS') "Ult.pac",
+        NLS_INITCAP(b.status) "body",
+        TO_CHAR(b.last_ddl_time, 'DD-MON-YYYY HH24:MI:SS') "Ult.body"
+        FROM obj a,obj b
+            WHERE
+            a.object_type = 'PACKAGE' and
+            b.object_type (+) = 'PACKAGE BODY' AND
+            a.object_name = b.object_name (+)
+            ORDER BY a.object_name;
+    
+-- USERS
+
+-- create laka user
+CREATE USER gtlaka IDENTIFIED BY gtlaka
+    DEFAULT TABLESPACE gtlaka TEMPORARY TABLESPACE TEMP;
+
+GRANT connect, resource, create view, create synonym TO gtlaka;
+GRANT execute on dbms_pipe TO gtlaka;
+ALTER USER gtlaka QUOTA UNLIMITED ON gtlaka;
+ALTER USER gtlaka QUOTA UNLIMITED ON gtlaka_index;
+
+-- select last created users
+SELECT * FROM dba_users
+    -- WHERE user_id BETWEEN &MIN and &MAX
+    ORDER BY created DESC;
+
+-- check laka users' dbms privilege 
+SELECT * FROM dba_tab_privs
+    WHERE table_name LIKE 'DBMS%'
+    AND grantee IN (
+        SELECT username FROM dba_users
+        WHERE user_id BETWEEN &MIN AND &MAX
+        );
+        
+-- check laka users' create privilege       
+SELECT * FROM dba_sys_privs
+    WHERE grantee IN (
+        SELECT username FROM dba_users
+        WHERE user_id BETWEEN &MIN AND &MAX
+        );
+
+-- check user occupied space		
+undef user
+SELECT sum(bytes)/1024/1024/1024 as TOT_SCHEMA_GB
+	FROM dba_segments
+	WHERE owner LIKE '&&user';

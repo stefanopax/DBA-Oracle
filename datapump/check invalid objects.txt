@@ -1,0 +1,5 @@
+-- display invalid objects, compare with objects from import db
+select OWNER,OBJECT_NAME,STATUS,OBJECT_TYPE from dba_objects where owner='FTFSTREN' and status <> 'VALID';
+
+-- compile single objects
+alter synonym/function FTFSTREN.READPIPE compile;

@@ -1,0 +1,3 @@
+alter session set container=pdb1;	--towards pluggable
+alter session set container=cdb$root;	--back to the application container
+

@@ -1,0 +1,9 @@
+-- run perl script
+cd $ORACLE_HOME/app
+
+-- upgrade all pdbs
+$ORACLE_HOME/perl/bin/perl $ORACLE_HOME/rdbms/admin/catcon.pl -l /tmp -b gather_dict_stats -- --x"EXEC DBMS_STATS.gather_dictionary_stats"
+
+-- upgrade single pdb
+-- set number after -n param, set pdb name after -c param
+$ORACLE_HOME/perl/bin/perl catctl.pl -n 2 -c "pdb2" -l /home/oracle catupgrd.sql

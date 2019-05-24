@@ -1,0 +1,21 @@
+-- start service readonly on fdb01
+EXEC DBMS_SERVICE.START_SERVICE('READONLYDB');
+-- CREATE PFILE = '/home/oracle/initfdb.ora' FROM SPFILE;
+-- FDB02
+show parameter proc
+alter system set processes=1024 scope=spfile; 
+shutdown immediate
+startup
+
+-- stop service readonly on fdb01
+EXEC DBMS_SERVICE.STOP_SERVICE('READONLYDB');
+
+
+----------------------------------------------
+
+-- CREATE PFILE = '/home/oracle/initfdb.ora' FROM SPFILE;
+-- FDB01
+show parameter proc
+alter system set processes=1024 scope=spfile; 
+shutdown immediate
+startup

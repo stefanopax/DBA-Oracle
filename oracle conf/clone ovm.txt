@@ -1,0 +1,3 @@
+/etc/sysconfig/network-scripts/ifcfg-eth0 	-- set current ip (used ip are ok only if not active) 
+/etc/hostname
+/etc/hosts

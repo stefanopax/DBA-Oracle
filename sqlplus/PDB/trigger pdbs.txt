@@ -1,0 +1,29 @@
+BEFORE CREATING THE TRIGGER:
+---------------------------------------------------------------------------------------------------------------
+-- Check if there are already saved states in the instance:
+SELECT * FROM DBA_PDB_SAVED_STATES;
+-- If there aren't, open the desired pluggable databases and execute the following statement from the cdb$root:
+ALTER PLUGGABLE DATABASE ALL SAVE STATE;
+---------------------------------------------------------------------------------------------------------------
+
+
+
+-----------------------------------------------------------------------------------------
+CREATE OR REPLACE TRIGGER managed_pdbs_start
+	AFTER STARTUP ON DATABASE
+DECLARE
+	role VARCHAR(64);
+BEGIN
+	SELECT database_role INTO role FROM v$database;
+	IF role = 'PHYSICAL STANDBY' THEN
+		BEGIN
+			FOR i IN (SELECT con_name FROM dba_pdb_saved_states a WHERE a.state = 'OPEN')
+			LOOP
+				EXECUTE IMMEDIATE 'ALTER PLUGGABLE DATABASE ' || i.con_name || ' OPEN';
+			END LOOP;
+		END;
+	END IF;
+END;
+/
+
+-----------------------------------------------------------------------------------------

@@ -1,0 +1,16 @@
+SELECT object_type, object_name, status
+    FROM all_objects
+    WHERE status = 'INVALID'
+    ORDER BY object_type, object_name
+/
+
+-- all_objects visible just from sys, user_objects visible just from tablespace's owner
+
+SELECT owner, object_type, object_name, status
+	FROM all_objects
+	WHERE status != 'VALID' AND
+	owner = '&utente'
+	ORDER BY object_type, object_name
+/
+
+-- / sostituisce ; e !=VALID trova sia INVALID che NaN

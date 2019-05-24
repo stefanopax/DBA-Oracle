@@ -1,0 +1,9 @@
+DIRECTORY=DATADIR
+DUMPFILE=ftfs_lotto.dmp
+LOGFILE=ftfs_lotto.log
+SCHEMAS=FTFS_LOTTO
+CONTENT=ALL
+EXCLUDE=STATISTICS
+QUERY=ftfs_lotto.tr:"where gtdt >= sysdate - 90"
+QUERY=ftfs_lotto.tr_bm:"where insdt >= sysdate - 90"
+QUERY=ftfs_lotto.tr_token:"where insdt >= sysdate - 90"

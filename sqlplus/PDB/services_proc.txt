@@ -1,0 +1,26 @@
+CREATE OR REPLACE PROCEDURE SYS.START_PDB_SERVICE_PROC IS
+	pdb_role VARCHAR(40);
+    pdb_name VARCHAR(40);
+    status VARCHAR(30);
+BEGIN
+	SELECT database_role INTO pdb_role FROM v$database;
+	FOR i IN (SELECT con_name FROM dba_pdb_saved_states)
+	LOOP
+		EXECUTE IMMEDIATE 'ALTER SESSION SET CONTAINER='|| i.con_name;
+		IF pdb_role = 'PRIMARY' THEN
+			DBMS_SERVICE.START_SERVICE(i.con_name || '_RW'); -- ORA-44305: servizio ORA12CPDB_RW in esecuzione
+			DBMS_SERVICE.STOP_SERVICE(i.con_name || '_RO'); -- ORA-44311: servizio ORA12CPDB_RO non in esecuzione
+		ELSE
+			SELECT open_mode INTO status FROM v$database;
+			IF status LIKE 'READ ONLY%' THEN
+				DBMS_SERVICE.START_SERVICE(i.con_name || '_RO');   
+				DBMS_SERVICE.STOP_SERVICE(i.con_name || '_RW');
+			ELSE
+			-- in this case open_mode is just 'MOUNTED'
+				DBMS_SERVICE.STOP_SERVICE(i.con_name || '_RW');   
+				DBMS_SERVICE.STOP_SERVICE(i.con_name || '_RO');
+			END IF;
+		END IF;
+	END LOOP; 
+END;
+/

@@ -1,0 +1,24 @@
+--PLUG & UNPLUG
+
+CREATE PLUGGABLE DATABASE testpdb 
+	admin user dbaclass identified by dbaclass 
+	FILE_NAME_CONVERT=(
+	'/u01/app/oracle/oradata/orcl3c/pdbseed',
+	'/u01/app/oracle/oradata/orcl3c/testpdb'
+	);
+
+-- exec this before unplug
+ALTER PLUGGABLE DATABASE testpdb CLOSE;
+
+ALTER PLUGGABLE DATABASE testpdb 
+	UNPLUG INTO '/u01/app/oracle/oradata/orcl3c/testpdb/testpdb.xml';
+
+-- this is necessary if plug goes on the same container
+DROP PLUGGABLE DATABASE testpdb
+	-- INCLUDING DATAFILES
+      KEEP DATAFILES;
+
+CREATE PLUGGABLE DATABASE pdb_clones
+	AS CLONE using
+	'/u01/app/oracle/oradata/orcl3c/testpdb/testpdb.xml' 
+	NOCOPY TEMPFILE REUSE;

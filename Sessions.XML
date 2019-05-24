@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfSessionData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SessionData SessionId="ImportedFromPuTTY/Default Settings" SessionName="Default Settings" Host="192.168.3.24" Port="22" Proto="SSH" PuttySession="Default Settings" Username="" SPSLFileName="" />
+  <SessionData SessionId="ImportedFromPuTTY/grid133" SessionName="grid133" Host="192.168.3.26" Port="22" Proto="SSH" PuttySession="grid133" Username="oracle" SPSLFileName="" />
+  <SessionData SessionId="ImportedFromPuTTY/observer19" SessionName="observer19" Host="192.168.3.30" Port="22" Proto="SSH" PuttySession="observer19" Username="" SPSLFileName="" />
+  <SessionData SessionId="ImportedFromPuTTY/ora12c" SessionName="ora12c" Host="192.168.3.24" Port="22" Proto="SSH" PuttySession="ora12c" Username="oracle" SPSLFileName="" />
+  <SessionData SessionId="ImportedFromPuTTY/ora19de" SessionName="ora19de" Host="192.168.3.29" Port="22" Proto="SSH" PuttySession="ora19de" Username="oracle" SPSLFileName="" />
+  <SessionData SessionId="ImportedFromPuTTY/ora19it" SessionName="ora19it" Host="192.168.3.28" Port="22" Proto="SSH" PuttySession="ora19it" Username="oracle" SPSLFileName="" />
+  <SessionData SessionId="ImportedFromPuTTY/oraclexe" SessionName="oraclexe" Host="192.168.1.122 " Port="22" Proto="SSH" PuttySession="oraclexe" Username="oracle" SPSLFileName="" />
+  <SessionData SessionId="ImportedFromPuTTY/OraTest1" SessionName="OraTest1" Host="192.168.3.23" Port="22" Proto="SSH" PuttySession="OraTest1" Username="" SPSLFileName="" />
+  <SessionData SessionId="ImportedFromPuTTY/ovm_redhat" SessionName="ovm_redhat" Host="192.168.3.22" Port="22" Proto="SSH" PuttySession="ovm_redhat" Username="oracle" SPSLFileName="" />
+  <SessionData SessionId="ImportedFromPuTTY/ovsserver.netsw.it" SessionName="ovsserver.netsw.it" Host="192.168.3.24" Port="22" Proto="SSH" PuttySession="ovsserver.netsw.it" Username="" SPSLFileName="" />
+  <SessionData SessionId="ImportedFromPuTTY/TEST loginserver LDAP" SessionName="TEST loginserver LDAP" Host="10.0.22.10" Port="22" Proto="SSH" PuttySession="TEST loginserver LDAP" Username="s.paci" SPSLFileName="" />
+  <SessionData SessionId="ImportedFromPuTTY/vmora10" SessionName="vmora10" Host="vmora10" Port="22" Proto="SSH" PuttySession="vmora10" Username="oracle" SPSLFileName="" />
+  <SessionData SessionId="ImportedFromPuTTY/vmora11" SessionName="vmora11" Host="vmora11" Port="22" Proto="SSH" PuttySession="vmora11" Username="oracle" SPSLFileName="" />
+  <SessionData SessionId="ImportedFromPuTTY/vmora12" SessionName="vmora12" Host="vmora12" Port="22" Proto="SSH" PuttySession="vmora12" Username="oracle" SPSLFileName="" />
+</ArrayOfSessionData>

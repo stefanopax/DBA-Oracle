@@ -1,0 +1,11 @@
+-- fast select
+SELECT DISTINCT username||';'||count(*) user_session 
+	FROM v$session 
+	GROUP BY username ORDER BY 1;
+
+-- complete select
+SELECT DISTINCT username, machine, count(*) FROM v$session
+    WHERE username LIKE '%'
+    GROUP BY username, machine
+    ORDER BY 3 DESC
+    ;

@@ -1,0 +1,25 @@
+EPS TEST
+
+http://global/wikinets/Wiki.jsp?page=EPS.DB01TEST
+
+- BYUSER-ITA: alfabetico
+- BYCRDT-ITA: in fondo
+
+http://global/wikinets/Wiki.jsp?page=EPS.DB01TEST.PASSWORD
+
+- UTENTI: in alto (alter user quota unlimited username_tablespace)
+- TABLESPACE: in alto
+
+-------------------------------------------------------------------
+
+FPS TEST
+
+http://global.netsw.it/wikinets/Wiki.jsp?page=FPS.FDB01TEST
+
+- BYUSER-ITA: alfabetico
+- BYCRDT-ITA: in fondo
+
+http://global.netsw.it/wikinets/Wiki.jsp?page=FPS.FDB01TEST.PASSWORD
+
+- UTENTI: in alto (alter user quota unlimited tablespace_name)
+- TABLESPACE: in alto

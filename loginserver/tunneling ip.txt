@@ -1,0 +1,12 @@
+-- PuTTy settings (Connection->SSH->Tunnels)
+Source port: 62230
+Destination: 127.0.0.1:62230
+Source port: 61130
+Destination: 127.0.0.1:61130
+Source port: 60030
+Destination: 127.0.0.1:60030
+-- processes connected to 60030, 61130, 62230 ports are redirected to localhost
+
+-- Login server host
+alias db01='ssh -X $USER@db01mng -L 62230:db03:1521 -L 61130:db02:1521 -L 60030:db01:1521 -o TCPKeepAlive=yes -o ServerAliveInterval=10'
+-- open connection with my user to db01mng host and forward 1521 processes on db03, db02, db01 hosts to 62230, 61130, 60030 ports (local_socket:host:hostport)

@@ -1,0 +1,36 @@
+# create alias to connect to the database
+
+ORA12 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.3.22)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SID = orcl)
+    )
+  )
+
+
+vmora12 =
+(DESCRIPTION =
+        (ADDRESS_LIST = (LOAD_BALANCE=OFF)(FAILOVER=ON)
+                (ADDRESS = (PROTOCOL = TCP)(HOST = vmora12.netsw.it)(PORT =1521))
+                (ADDRESS = (PROTOCOL = TCP)(HOST = vmora12stby.netsw.it)(PORT =1521))
+        )
+        (CONNECT_DATA = (SERVICE_NAME = DB)
+                (FAILOVER_MODE= (TYPE=session)
+                        (METHOD=basic) (RETRIES=180) (DELAY=5)
+                )
+        )
+ )
+
+
+vmora11 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)
+      (HOST = vmora11.netsw.it)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = DB)
+    )
+  )

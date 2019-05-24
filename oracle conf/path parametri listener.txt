@@ -1,0 +1,1 @@
+/u01/app/oracle/product/12.2.0/dbhome_2/network/admin/listener

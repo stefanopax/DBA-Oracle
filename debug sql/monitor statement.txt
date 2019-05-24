@@ -1,0 +1,4 @@
+explain plan for
+select * from v$session;	-- the statement I need to monitor
+
+select * from (dbms_xplan.display());

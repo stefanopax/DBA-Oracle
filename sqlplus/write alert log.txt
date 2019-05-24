@@ -1,0 +1,1 @@
+dbms_system.ksdwrt(1,'test');

@@ -1,0 +1,20 @@
+-- SHARING DATA INTO AN APP CONTAINER
+
+-- We must introduce a container into the app container
+
+alter pluggable database application DEMOAPP begin install '1.0';
+.. create tablespaces (OMF)
+.. create users
+.. create application objects
+alter pluggable database application DEMOAPP end install '1.0';
+
+create table zip_codes
+	sharing=extended data
+	  (zip_code number ,
+	  country varchar2(20)
+	  );
+insert into zip_codes values
+	(1, 
+	'India(root)
+	');
+commit;

@@ -1,0 +1,32 @@
+BEFORE CREATING THE TRIGGER:
+------------------------------------------------------------------------------------------------------------------------------------------
+-- Be sure you're connected to the correct pluggable:
+SELECT Upper(sys_context ('userenv', 'con_name')) INTO pdb_name FROM dual;
+-- Check if there are online services with same name: 
+SELECT name, pdb FROM cdb_services;
+-- Create the RW and RO service into each pluggable:
+SELECT 'EXEC DBMS_SERVICE.CREATE_SERVICE('''||  name || '_RW''' || ', ''' || name || '_RW'');' FROM v$pdbs WHERE name NOT IN ('PDB$SEED');
+SELECT 'EXEC DBMS_SERVICE.CREATE_SERVICE('''||  name || '_RO''' || ', ''' || name || '_RO'');' FROM v$pdbs WHERE name NOT IN ('PDB$SEED');
+------------------------------------------------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+CREATE OR REPLACE TRIGGER managed_service_start
+	AFTER STARTUP ON DATABASE
+DECLARE
+	pdb_role VARCHAR2(64);
+	pdb_name VARCHAR2(64);
+BEGIN
+	SELECT database_role INTO pdb_role FROM v$database;
+	SELECT Upper(sys_context ('userenv', 'con_name')) INTO pdb_name FROM dual;
+	IF pdb_role LIKE 'PRIMARY' THEN
+		DBMS_SERVICE.START_SERVICE(pdb_name || '_RW');
+		DBMS_SERVICE.STOP_SERVICE(pdb_name || '_RO');
+	ELSE
+		DBMS_SERVICE.START_SERVICE(pdb_name || '_RO');
+		DBMS_SERVICE.STOP_SERVICE(pdb_name || '_RW');
+	END IF;
+END;
+/
+
+------------------------------------------------------------------------------
