@@ -1,0 +1,84 @@
+-- Manual removal procedure of dataguard configuration. Run it if Enterprise Manager is having trouble
+
+>> dgmgrl
+DGMGRL for Linux: Version 11.2.0.4.0 - 64bit Production
+
+Copyright (c) 2000, 2009, Oracle. All rights reserved.
+
+Welcome to DGMGRL, type "help" for information.
+DGMGRL> connect /
+Connected.
+DGMGRL> show configuration
+
+Configuration - fpsdb.fdb01mng
+
+  Protection Mode: MaxPerformance
+  Databases:
+    fpsdb          - Primary database
+    fpsdb_fdb02mng - Physical standby database
+
+Fast-Start Failover: DISABLED
+
+Configuration Status:
+SUCCESS
+
+DGMGRL> remove configuration
+Removed configuration
+DGMGRL> show configuration
+ORA-16532: Data Guard broker configuration does not exist
+
+Configuration details cannot be determined by DGMGRL
+DGMGRL> exit
+FPS_PRI[oracle@fdb01 ~]$ sql
+
+SQL*Plus: Release 11.2.0.4.0 Production on Wed Apr 11 11:30:33 2018
+
+Copyright (c) 1982, 2013, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production
+With the Partitioning option
+
+SQL> select name , value from v$parameter
+  2  where name like '%dg_broker%';
+
+NAME
+--------------------------------------------------------------------------------
+VALUE
+--------------------------------------------------------------------------------
+dg_broker_start
+TRUE
+
+dg_broker_config_file1
+/mp1/oracle/product/11.2.0.4/dbhome_1/dbs/dr1fpsdb.dat
+
+dg_broker_config_file2
+/mp1/oracle/product/11.2.0.4/dbhome_1/dbs/dr2fpsdb.dat
+
+
+SQL> alter system set dg_broker_start=FALSE;
+
+System altered.
+
+SQL> select name , value from v$parameter where name like '%dg_broker%';
+
+NAME
+--------------------------------------------------------------------------------
+VALUE
+--------------------------------------------------------------------------------
+dg_broker_start
+FALSE
+
+dg_broker_config_file1
+/mp1/oracle/product/11.2.0.4/dbhome_1/dbs/dr1fpsdb.dat
+
+dg_broker_config_file2
+/mp1/oracle/product/11.2.0.4/dbhome_1/dbs/dr2fpsdb.dat
+
+
+SQL> exit
+Disconnected from Oracle Database 11g Enterprise Edition Release 11.2.0.4.0 - 64bit Production
+With the Partitioning option
+FPS_PRI[oracle@fdb01 ~]$ mv /mp1/oracle/product/11.2.0.4/dbhome_1/dbs/dr1fpsdb.dat /mp1/oracle/product/11.2.0.4/dbhome_1/dbs/dr1fpsdb.dat.bak
+FPS_PRI[oracle@fdb01 ~]$ mv /mp1/oracle/product/11.2.0.4/dbhome_1/dbs/dr2fpsdb.dat /mp1/oracle/product/11.2.0.4/dbhome_1/dbs/dr2fpsdb.dat.bak

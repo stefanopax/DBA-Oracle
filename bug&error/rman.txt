@@ -1,0 +1,66 @@
+>rman
+rman> connect target /
+
+-- Or
+
+> rman connect target /
+
+-- rman on other DB (configured TNS)
+
+> rman target=sys/<password>@d01
+
+-- Configuration#
+
+rman> show all;
+
+-- Retention / deletion policy for DB in ARCHIVELOG MODE:#
+
+CONFIGURE RETENTION POLICY TO RECOVERY WINDOW OF 2 DAYS;
+
+CONFIGURE ARCHIVELOG DELETION POLICY TO [APPLIED\SHIPPED] ON STANDBY;
+-- or 
+CONFIGURE ARCHIVELOG DELETION POLICY TO [APPLIED\SHIPPED]ON ALL STANDBY;
+
+-- RMAN configuration example:
+CONFIGURE RETENTION POLICY TO REDUNDANCY 1; # default
+CONFIGURE BACKUP OPTIMIZATION OFF; # default
+CONFIGURE DEFAULT DEVICE TYPE TO DISK; # default
+CONFIGURE CONTROLFILE AUTOBACKUP ON; # default
+CONFIGURE CONTROLFILE AUTOBACKUP FORMAT FOR DEVICE TYPE DISK TO '%F'; # default
+CONFIGURE DEVICE TYPE DISK PARALLELISM 1 BACKUP TYPE TO BACKUPSET; # default
+CONFIGURE DATAFILE BACKUP COPIES FOR DEVICE TYPE DISK TO 1; # default
+CONFIGURE ARCHIVELOG BACKUP COPIES FOR DEVICE TYPE DISK TO 1; # default
+CONFIGURE MAXSETSIZE TO UNLIMITED; # default
+CONFIGURE ENCRYPTION FOR DATABASE OFF; # default
+CONFIGURE ENCRYPTION ALGORITHM 'AES128'; # default
+CONFIGURE COMPRESSION ALGORITHM 'BASIC' AS OF RELEASE 'DEFAULT' OPTIMIZE FOR LOAD TRUE ; # default
+CONFIGURE RMAN OUTPUT TO KEEP FOR 7 DAYS; # default
+CONFIGURE ARCHIVELOG DELETION POLICY TO APPLIED ON ALL STANDBY; # ON ALL obbligatorio per auto-cancellazione archive
+CONFIGURE SNAPSHOT CONTROLFILE NAME TO '/app/oracle/product/12.2.0/dbhome_1/dbs/snapcf_orcl122.f'; # default
+
+-- Archivelog List Commands#
+
+    RMAN>list archivelog all;
+    RMAN>list copy of archivelog until time "SYSDATE-10";
+    RMAN>list copy of archivelog from time "SYSDATE-10"
+    RMAN>list copy of archivelog from time "SYSDATE-10" until time "SYSDATE-2";
+    RMAN>list copy of archivelog from sequence 1000;
+    RMAN>list copy of archivelog until sequence 1500;
+    RMAN>list copy of archivelog from sequence 1000 until sequence 1500; 
+
+-- Archivelog Delete Commands#
+
+    RMAN>delete archivelog all;
+    RMAN>delete archivelog until time "SYSDATE-10";
+    RMAN>delete archivelog from time "SYSDATE-10"
+    RMAN>delete archivelog from time "SYSDATE-10" until time "SYSDATE-2";
+    RMAN>delete archivelog from sequence 1000;
+    RMAN>delete archivelog until sequence 1500;
+    RMAN>delete archivelog from sequence 1000 until sequence 1500;
+
+    Note : Also, you can use noprompt statement for do not yes-no question.
+    RMAN>delete noprompt archivelog until time "SYSDATE-10"; 
+
+-- Crosscheck (in presence of archive deleted by OS)#
+
+    crosscheck archivelog all ​​;​

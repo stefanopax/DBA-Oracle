@@ -1,0 +1,12 @@
+-- Update file listener.log expected to grow in time.
+
+-- If you have a 24X7 environment and the listener can not be stopped, then you can use the following steps to rename / move the file without having to restart it: 
+
+LSNRCTL> set current_listener <listenername>
+LSNRCTL> set log_status off
+
+-- In another window rename the log file. Then return to previous window
+
+LSNRCTL> set log_status on
+
+-- which will create a new and empty listener.log file which will continue logging.  ​

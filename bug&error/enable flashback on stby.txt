@@ -1,0 +1,79 @@
+-- Enable Flashback Database on Standby Database - ORA-01153​
+
+Error
+ORA-01153 trying to turn on Flashback for Physical Standby Database
+
+SQL> alter database flashback on;
+alter database flashback on
+*
+ERROR at line 1:
+ORA-01153: an incompatible media recovery is active
+
+-- To check the status of recovery process running on the standby database
+
+SQL> select PROCESS,CLIENT_PROCESS,THREAD#,SEQUENCE#,BLOCK# from v$managed_standby where process = 'MRP0' or client_process='LGWR';
+
+PROCESS   CLIENT_P    THREAD#  SEQUENCE#     BLOCK#
+--------- -------- ---------- ---------- ----------
+RFS       LGWR              1         41         88
+RFS       LGWR              2         36         85
+MRP0      N/A               2         36         85
+
+remote file server (RFS)
+Managed Recovery Process (MRP)
+
+-- Canceling the Recovery process on the standby database
+
+SQL> alter database recover managed standby database cancel;
+
+Database altered.
+
+-- To check the status of recovery process after cancelling it on the standby database
+
+SQL> select PROCESS,CLIENT_PROCESS,THREAD#,SEQUENCE#,BLOCK# from v$managed_standby where process = 'MRP0' or client_process='LGWR';
+
+PROCESS   CLIENT_P    THREAD#  SEQUENCE#     BLOCK#
+--------- -------- ---------- ---------- ----------
+RFS       LGWR              1         41        134
+RFS       LGWR              2         36        131
+
+NOTE: there is no recovery process running on the database. trying it again.
+SQL> /
+
+PROCESS   CLIENT_P    THREAD#  SEQUENCE#     BLOCK#
+--------- -------- ---------- ---------- ----------
+RFS       LGWR              1         41        137
+RFS       LGWR              2         36        133
+
+-- Now Enabling the FLASHBACK DATABASE on the standby database
+
+SQL> alter database flashback on;
+
+Database altered.
+
+-- Checking the status of the flashback on the database
+
+SQL> select flashback_on from gv$database;
+
+FLASHBACK_ON
+------------------
+YES
+YES
+
+-- Starting managed recovery process again in the standby database
+
+SQL> alter database recover managed standby database disconnect from session;
+
+Database altered.
+
+-- To check the status of recovery process after starting it on the standby database
+
+SQL> select PROCESS,CLIENT_PROCESS,THREAD#,SEQUENCE#,BLOCK# from v$managed_standby where process = 'MRP0' or client_process='LGWR';
+
+PROCESS   CLIENT_P    THREAD#  SEQUENCE#     BLOCK#
+--------- -------- ---------- ---------- ----------
+RFS       LGWR              1         45        714
+RFS       LGWR              2         40        630
+MRP0      N/A               2         40          0
+
+Note: we could see the MRP process is started again.
