@@ -1,0 +1,6 @@
+-- move to schema
+ALTER SESSION SET CURRENT_SCHEMA=schema_name;
+
+-- export ddl 
+SELECT dbms_metadata.get_ddl('TABLE', 'TABLE_NAME', 'OWNER')
+	from dual;
