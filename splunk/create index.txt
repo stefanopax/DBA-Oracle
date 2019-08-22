@@ -1,0 +1,11 @@
+# create index in a clustered environment
+- Edit file indexes.conf in the path $SPLUNK_HOME/etc/master-apps/_cluster/local (if there isn't, create one) like this:
+[prova_index]
+repFactor = auto
+homePath = $SPLUNK_DB/prova_index/db
+coldPath = $SPLUNK_DB/prova_index/colddb
+thawedPath = $SPLUNK_DB/prova_index/thaweddb
+maxDataSize = auto_high_volume
+frozenTimePeriodInSecs = 604800 #in seconds
+- On the web interface, go to settings->indexer clustering->edit->distribute configuration bundle 
+- Press Validate and check and if there is ok, go on with Push action (this deploy the index all over the cluster peers indexes)
