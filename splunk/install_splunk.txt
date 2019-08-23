@@ -1,0 +1,86 @@
+On all hosts:
+- cd /tmp
+- tar xvzf splunk-*.tgz -C /opt
+
+Create splunk user
+(
+- useradd splunk
+- passwd splunk
+)
+
+Set directory ownership
+- chown -R splunk:splunk /opt/splunk/
+- su splunk -c "/opt/splunk/bin/splunk start --accept-license"
+- /opt/splunk/bin/splunk enable boot-start -user splunk
+
+Export default global variables and add some useful alias 
+- vi .bashrc
+(
+export SPLUNK_HOME=/opt/splunk
+export PATH=$SPLUNK_HOME/bin:$PATH
+)
+
+__DISABLE OS HugePage__
+RHEL < 7
+- sudo vi /etc/grub.conf
+- transparent_hugepage=never
+
+RHEL >= 7
+(doc: https://access.redhat.com/solutions/1320153)
+- sudo vi /etc/default/grub
+Add at the end of GRUB_CMDLINE_LINUX transparent_hugepage=never option
+ex.
+- GRUB_CMDLINE_LINUX="rd.lvm.lv=rhel/root rd.lvm.lv=rhel/swap vconsole.font=latarcyrheb-sun16 vconsole.keymap=us transparent_hugepage=never" 
+
+Ricompile grub:
+- sudo grub2-mkconfig -o /boot/grub2/grub.cfg 
+- sudo reboot
+
+Trasparent_hugepage control
+- sudo cat /sys/kernel/mm/transparent_hugepage/enabled
+- always madvise [never] --> OK
+
+Set ulimit parameters
+- sudo vi /etc/security/limits.conf
+- splunk soft nofile 10240
+- splunk hard nofile 10240
+- sudo sed -i '/init.d\/functions/a ulimit -Sn 10240' /etc/init.d/splunk
+- sudo sed -i '/init.d\/functions/a ulimit -Hn 10240' /etc/init.d/splunk
+- sudo reboot
+
+Check this worked out
+- grep ulimit $SPLUNK_HOME/var/log/splunk/splunkd.log
+
+Set web credentials
+- splunk set web-port 8443
+- splunk user: admin
+- pwd: changeme
+
+- splunk restart
+
+On the server web interface I need to be Master:
+- Settings/Distribuited env./Indexer clustering
+Compile form and set pwd
+
+On the servers web interface I need to be indexers:
+- Settings/Distribuited env./Indexer clustering
+- choose peer node inserting master node address
+
+On the servers web interface I need to be search head:
+- Settings/Distribuited env./Indexer clustering
+- choose peer node inserting master node address
+
+Load license on the master server and let others become slave.
+
+/* create sample index in cluster 
+[test_index] 
+repFactor = auto
+homePath = /opt/splunk/var/lib/splunk/test_index/db
+coldPath = /opt/splunk/var/lib/splunk/test_index/colddb
+thawedPath = /opt/splunk/var/lib/splunk/test_index/thaweddb 
+maxDataSize = auto_high_volume 
+
+(
+# for a 180 days retention
+frozenTimePeriodInSecs = 15552000
+)
