@@ -1,0 +1,10 @@
+# create default primary group
+groupadd oinstall
+# you can decide to create the secondary group dba
+useradd oracle
+# this set the primary group
+usermod -a -G oinstall oracle
+# this set the secondary group
+usermod -g oinstall oracle
+passwd oracle
+# then edit oracle bash profile
