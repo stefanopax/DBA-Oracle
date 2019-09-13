@@ -1,0 +1,52 @@
+#!/bin/bash
+# chkconfig: 2345 20 80
+# description: Oracle auto start-stop script.
+# processname: oracle
+#
+# Set ORA_HOME to be equivalent to the $ORACLE_HOME
+# from which you wish to execute dbstart and dbshut;
+#
+# Set ORA_OWNER to the user id of the owner of the
+# Oracle database in ORA_HOME.
+ORA_HOME=/u01/app/oracle/product/11.2.0/xe
+ORA_OWNER=oracle
+LOG=$ORA_HOME/dbora.log
+RETVAL=0
+touch $LOG
+chmod a+r $LOG
+if [ ! -f $ORA_HOME/bin/dbstart ]
+then
+  echo "Oracle startup: cannot start"
+  exit
+fi
+case "$1" in
+     'start')
+       # Start the Oracle databases:
+       # The following command assumes that the oracle login
+       # will not prompt the user for any values
+       echo "$0: starting up" >> $LOG
+       date >> $LOG
+       #su - $ORA_OWNER -c "$ORA_HOME/bin/lsnrctl start" >> $LOG 2>&1
+       #su - $ORA_OWNER -c "$ORA_HOME/bin/dbstart $ORA_HOME &" >> $LOG
+       su - $ORA_OWNER -c "$ORA_HOME/../../../agent13/agent_inst/bin/emctl start agent &" >> $LOG
+       touch /var/lock/subsys/dbora
+       ;;
+      'stop')
+       # Stop the Oracle databases:
+       # The following command assumes that the oracle login
+       # will not prompt the user for any values
+       echo "$0: stopping down" >> $LOG
+       date >> $LOG
+       su - $ORA_OWNER -c "$ORA_HOME/../../../agent13/agent_inst/bin/emctl stop agent &" >> $LOG
+       ##su - $ORA_OWNER -c "$ORA_HOME/bin/lsnrctl stop" >> $LOG 2>&1
+       ##su - $ORA_OWNER -c "$ORA_HOME/bin/dbshut $ORA_HOME &" >> $LOG
+       rm -f /var/lock/subsys/dbora
+       ;;
+     'status')
+       echo "$0: status"
+       date
+
+       su - $ORA_OWNER -c "$ORA_HOME/bin/lsnrctl status"
+       ;;
+esac
+"dbora" [readonly] 51L, 1647C
